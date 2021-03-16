@@ -54,6 +54,7 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="ProjectId" id="1TDwMYWyFjHDXmqY1fHlzbTKALo" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -68,7 +69,7 @@
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
-    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
+    <property name="settings.editor.selected.configurable" value="configurable.group.project" />
     <property name="vue.rearranger.settings.migration" value="true" />
   </component>
   <component name="RecentsManager">
@@ -80,7 +81,7 @@
   </component>
   <component name="RunManager" selected="Python.main">
     <configuration name="data_loader" type="PythonConfigurationType" factoryName="Python" temporary="true">
-      <module name="NER-action" />
+      <module name="Bistu-DZ" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
@@ -102,7 +103,7 @@
       <method v="2" />
     </configuration>
     <configuration name="main" type="PythonConfigurationType" factoryName="Python" temporary="true">
-      <module name="NER-action" />
+      <module name="Bistu-DZ" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
@@ -124,7 +125,7 @@
       <method v="2" />
     </configuration>
     <configuration name="model_utils" type="PythonConfigurationType" factoryName="Python" temporary="true">
-      <module name="NER-action" />
+      <module name="Bistu-DZ" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
@@ -177,7 +178,7 @@
       <workItem from="1573007931467" duration="471000" />
       <workItem from="1615795244942" duration="191000" />
       <workItem from="1615795456222" duration="1367000" />
-      <workItem from="1615853893772" duration="76000" />
+      <workItem from="1615853893772" duration="464000" />
     </task>
     <servers />
   </component>

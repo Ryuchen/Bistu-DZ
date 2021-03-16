@@ -2,7 +2,7 @@ import os
 import json
 import logging
 from collections import OrderedDict
-from conlleval import return_report
+from preprocess.conlleval import return_report
 import codecs
 import tensorflow as tf
 

@@ -1,3 +1,18 @@
+# !/usr/bin/env python
+# -*- coding: utf-8 -*-
+# ========================================================
+# @Author: Ryuchen
+# @Time: 2021/03/1-08:32
+# @Site: https://ryuchen.github.io
+# @Contact: chenhaom1993@hotmail.com
+# @Copyright: Copyright (C) 2019-2020 Bistu-DZ.
+# ========================================================
+"""
+...
+DocString Here
+...
+"""
+
 import os
 import pickle
 import itertools
@@ -6,12 +21,11 @@ import numpy as np
 import tensorflow as tf
 
 # 自定义
-import data_utils
-import data_loader
-import model_utils
+from utils import data_loader, data_utils
+from models import model_utils
 
-from model import Model
-from data_utils import load_word2vec
+from models.NER.model import Model
+from utils.data_utils import load_word2vec
 
 flags = tf.app.flags
 

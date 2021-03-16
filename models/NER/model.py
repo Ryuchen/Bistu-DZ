@@ -4,7 +4,7 @@ import tensorflow.contrib.rnn as rnn
 from tensorflow.contrib.crf import crf_log_likelihood
 from tensorflow.contrib.crf import viterbi_decode
 import numpy as np
-import data_utils
+from utils import data_utils
 
 
 class Model(object):

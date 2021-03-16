@@ -117,7 +117,7 @@ def prepare_dataset(sentences, word_to_id, tag_to_id, train=True):
 
 
 if __name__ == "__main__":
-    path = "data/ner.dev"
+    path = "../data/NER/ner.dev"
     sentences = load_sentences(path)
     update_tag_scheme(sentences, "BIOES")
     _, word_to_id, id_to_word = word_mapping(sentences)
