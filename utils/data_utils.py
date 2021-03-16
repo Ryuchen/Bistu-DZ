@@ -1,9 +1,9 @@
-import jieba
+import os
 import math
+import jieba
 import random
 import codecs
 import numpy as np
-import os
 
 
 def check_bio(tags):
@@ -218,6 +218,7 @@ def augment_with_pretrained(dico_train, emb_path, test_words):
 
 
 class BatchManager(object):
+
     def __init__(self, data, batch_size):
         self.batch_data = self.sort_and_pad(data, batch_size)
         self.len_data = len(self.batch_data)

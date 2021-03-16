@@ -1,5 +1,21 @@
+# !/usr/bin/env python
+# -*- coding: utf-8 -*-
+# ========================================================
+# @Author: Ryuchen
+# @Time: 2021/03/1-08:32
+# @Site: https://ryuchen.github.io
+# @Contact: chenhaom1993@hotmail.com
+# @Copyright: Copyright (C) 2019-2020 Bistu-DZ.
+# ========================================================
+"""
+...
+DocString Here
+...
+"""
+
 import codecs
-import data_utils
+
+from utils import data_utils
 
 
 def load_sentences(path):
@@ -15,14 +31,16 @@ def load_sentences(path):
     # 临时存放每一个句子
     sentence = []
     for line in codecs.open(path, 'r', encoding='utf-8'):
-        # 去掉两边空格
+        # 逐行去读取数据集内容，去掉两边空格
         line = line.strip()
+        # 前一步把空格去掉了，所以这一步就变成了空字符串
         # 首先判断是不是空，如果是则表示句子和句子之间的分割点
         if not line:
             if len(sentence) > 0:
                 sentences.append(sentence)
                 # 清空sentence表示一句话完结
                 sentence = []
+        # 如果不是，就将当前的字和标记保存下来，放到临时存放的地方
         else:
             if line[0] == " ":
                 continue
@@ -38,7 +56,7 @@ def load_sentences(path):
 
 def update_tag_scheme(sentences, tag_scheme):
     """
-    更新为指定编码
+    更新为指定编码 BIOES 限定了输入的句子编码只能为BIO编码
     :param sentences:
     :param tag_scheme:
     :return:
@@ -122,5 +140,10 @@ if __name__ == "__main__":
     update_tag_scheme(sentences, "BIOES")
     _, word_to_id, id_to_word = word_mapping(sentences)
     _, tag_to_id, id_to_tag = tag_mapping(sentences)
+    # 返回的是列表，列表中的每个元素也是一个列表四个元素的列表包含：
+    # 0：句子字的列表-> word_list ['相', '比', '之', '下']
+    # 1：句子字的id列表 -> word_id_list [240, 181, 127, 70]
+    # 2：句子字的分词列表 -> segs_list [1, 2, 2, 3] === 0 表示单个字成词, 1 表示一个词的开始， 2 表示一个词的中间，3 表示一个词的结尾
+    # 3：句子字的bioes标记列表 -> segs_list [0, 0, 0, 0]
     dev_data = prepare_dataset(sentences, word_to_id, tag_to_id)
     data_utils.BatchManager(dev_data, 120)

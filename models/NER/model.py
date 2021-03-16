@@ -1,10 +1,12 @@
+import numpy as np
 import tensorflow as tf
-from tensorflow.contrib.layers.python.layers import initializers
 import tensorflow.contrib.rnn as rnn
+
+from utils import data_utils
+
 from tensorflow.contrib.crf import crf_log_likelihood
 from tensorflow.contrib.crf import viterbi_decode
-import numpy as np
-from utils import data_utils
+from tensorflow.contrib.layers.python.layers import initializers
 
 
 class Model(object):
@@ -24,11 +26,11 @@ class Model(object):
         self.initializer = initializers.xavier_initializer()
 
         # 申请占位符
-        self.word_inputs = tf.placeholder(dtype=tf.int32, shape=[None, None], name="wordInputs")
-        self.seg_inputs = tf.placeholder(dtype=tf.int32, shape=[None, None], name="SegInputs")
-        self.targets = tf.placeholder(dtype=tf.int32, shape=[None, None], name="Targets")
+        self.word_inputs = tf.compat.v1.placeholder(dtype=tf.int32, shape=[None, None], name="wordInputs")
+        self.seg_inputs = tf.compat.v1.placeholder(dtype=tf.int32, shape=[None, None], name="SegInputs")
+        self.targets = tf.compat.v1.placeholder(dtype=tf.int32, shape=[None, None], name="Targets")
 
-        self.dropout = tf.placeholder(dtype=tf.float32, name="Dropout")
+        self.dropout = tf.compat.v1.placeholder(dtype=tf.float32, name="Dropout")
 
         used = tf.sign(tf.abs(self.word_inputs))
         length = tf.reduce_sum(used, reduction_indices=1)
@@ -51,14 +53,14 @@ class Model(object):
         # 损失
         self.loss = self.crf_loss_layer(self.logits, self.lengths)
 
-        with tf.variable_scope('optimizer'):
+        with tf.compat.v1.variable_scope('optimizer'):
             optimizer = self.config['optimizer']
             if optimizer == "sgd":
-                self.opt = tf.train.GradientDescentOptimizer(self.lr)
+                self.opt = tf.compat.v1.train.GradientDescentOptimizer(self.lr)
             elif optimizer == "adam":
-                self.opt = tf.train.AdamOptimizer(self.lr)
+                self.opt = tf.compat.v1.train.AdamOptimizer(self.lr)
             elif optimizer == "adgrad":
-                self.opt = tf.train.AdagradDAOptimizer(self.lr)
+                self.opt = tf.compat.v1.train.AdagradDAOptimizer(self.lr)
             else:
                 raise Exception("优化器错误")
 
@@ -69,7 +71,7 @@ class Model(object):
             self.train_op = self.opt.apply_gradients(capped_grad_vars, self.global_step)
 
             # 保存模型
-            self.saver = tf.train.Saver(tf.global_variables(), max_to_keep=5)
+            self.saver = tf.compat.v1.train.Saver(tf.compat.v1.global_variables(), max_to_keep=5)
 
     def embedding_layer(self, word_inputs, seg_inputs, config, name=None):
         """
@@ -80,8 +82,8 @@ class Model(object):
         :return:
         """
         embedding = []
-        with tf.variable_scope("word_embedding" if not name else name), tf.device('/cpu:0'):
-            self.word_lookup = tf.get_variable(
+        with tf.compat.v1.variable_scope("word_embedding" if not name else name), tf.device('/cpu:0'):
+            self.word_lookup = tf.compat.v1.get_variable(
                 name="word_embedding",
                 shape=[self.num_words, self.word_dim],
                 initializer=self.initializer
@@ -89,8 +91,8 @@ class Model(object):
             embedding.append(tf.nn.embedding_lookup(self.word_lookup, word_inputs))
 
             if config['seg_dim']:
-                with tf.variable_scope("seg_embedding"), tf.device('/cpu:0'):
-                    self.seg_lookup = tf.get_variable(
+                with tf.compat.v1.variable_scope("seg_embedding"), tf.device('/cpu:0'):
+                    self.seg_lookup = tf.compat.v1.get_variable(
                         name="seg_embedding",
                         shape=[self.num_sges, self.seg_dim],
                         initializer=self.initializer
@@ -106,10 +108,10 @@ class Model(object):
         :param name:
         :return: [batch_size, num_steps, 2*lstm_dim]
         """
-        with tf.variable_scope("word_biLSTM" if not name else name):
+        with tf.compat.v1.variable_scope("word_biLSTM" if not name else name):
             lstm_cell = {}
             for direction in ['forward', 'backward']:
-                with tf.variable_scope(direction):
+                with tf.compat.v1.variable_scope(direction):
                     lstm_cell[direction] = rnn.CoupledInputForgetGateLSTMCell(
                         lstm_dim,
                         use_peepholes=True,
@@ -121,7 +123,6 @@ class Model(object):
                 lstm_cell['backward'],
                 lstm_inputs,
                 dtype=tf.float32,
-
                 sequence_length=lengths
             )
 
@@ -133,38 +134,38 @@ class Model(object):
         :param name:
         :return: [btch_size,num_steps, num_tags]
         """
-        with tf.variable_scope('project_layer' if not name else name):
-            with tf.variable_scope('hidden_layer'):
-                W = tf.get_variable(
+        with tf.compat.v1.variable_scope('project_layer' if not name else name):
+            with tf.compat.v1.variable_scope('hidden_layer'):
+                W = tf.compat.v1.get_variable(
                     "W",
                     shape=[self.lstm_dim * 2, self.lstm_dim],
                     dtype=tf.float32,
                     initializer=self.initializer
                 )
-                b = tf.get_variable(
+                b = tf.compat.v1.get_variable(
                     "b",
                     shape=[self.lstm_dim],
                     dtype=tf.float32,
                     initializer=tf.zeros_initializer()
                 )
                 out_put = tf.reshape(lstm_outputs, shape=[-1, self.lstm_dim * 2])
-                hidden = tf.tanh(tf.nn.xw_plus_b(out_put, W, b))
+                hidden = tf.tanh(tf.compat.v1.nn.xw_plus_b(out_put, W, b))
 
-            with tf.variable_scope('logits'):
-                W = tf.get_variable(
+            with tf.compat.v1.variable_scope('logits'):
+                W = tf.compat.v1.get_variable(
                     "W",
                     shape=[self.lstm_dim, self.num_tags],
                     dtype=tf.float32,
                     initializer=self.initializer
                 )
-                b = tf.get_variable(
+                b = tf.compat.v1.get_variable(
                     "b",
                     shape=[self.num_tags],
                     dtype=tf.float32,
                     initializer=tf.zeros_initializer()
                 )
 
-                pred = tf.nn.xw_plus_b(hidden, W, b)
+                pred = tf.compat.v1.nn.xw_plus_b(hidden, W, b)
         return tf.reshape(pred, [-1, self.num_setps, self.num_tags])
 
     def crf_loss_layer(self, project_logits, lenghts, name=None):
@@ -174,7 +175,7 @@ class Model(object):
         :param name:
         :return: scalar loss
         """
-        with tf.variable_scope('crf_loss' if not name else name):
+        with tf.compat.v1.variable_scope('crf_loss' if not name else name):
             small_value = -10000.0
             start_logits = tf.concat(
                 [
@@ -211,7 +212,7 @@ class Model(object):
                 axis=-1
             )
 
-            self.trans = tf.get_variable(
+            self.trans = tf.compat.v1.get_variable(
                 "transitions",
                 shape=[self.num_tags + 1, self.num_tags + 1],
                 initializer=self.initializer

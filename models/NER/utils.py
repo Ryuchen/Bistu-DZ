@@ -1,9 +1,11 @@
 import os
 import json
+import codecs
 import logging
+
 from collections import OrderedDict
 from preprocess.conlleval import return_report
-import codecs
+
 import tensorflow as tf
 
 
@@ -21,15 +23,15 @@ def get_logger(log_file):
     fh = logging.FileHandler(log_file)
     fh.setLevel(logging.DEBUG)
     # 创建一个控制台的handler，并设置日志级别为DEBUG
-    ch = logging.StreamHandler()
-    ch.setLevel(logging.INFO)
+    # ch = logging.StreamHandler()
+    # ch.setLevel(logging.INFO)
     # 设置日志格式
     formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
     # add formatter to ch and fh
-    ch.setFormatter(formatter)
+    # ch.setFormatter(formatter)
     fh.setFormatter(formatter)
     # add ch and fh to logger
-    logger.addHandler(ch)
+    # logger.addHandler(ch)
     logger.addHandler(fh)
     return logger
 
@@ -60,12 +62,14 @@ def make_path(params):
     :param params:
     :return:
     """
-    if not os.path.isdir(params.result_path):
-        os.makedirs(params.result_path)
+    if not os.path.isdir(params.log_path):
+        os.makedirs(params.log_path)
     if not os.path.isdir(params.ckpt_path):
         os.makedirs(params.ckpt_path)
-    if not os.path.isdir('log'):
-        os.makedirs('log')
+    if not os.path.isdir(params.config_path):
+        os.makedirs(params.config_path)
+    if not os.path.isdir(params.result_path):
+        os.makedirs(params.result_path)
 
 
 def save_config(config, config_file):
@@ -115,12 +119,12 @@ def create(sess, Model, ckpt_path, load_word2vec, config, id_to_word, logger):
 
     ckpt = tf.train.get_checkpoint_state(ckpt_path)
     if ckpt and tf.train.checkpoint_exists(ckpt.model_checkpoint_path):
-        logger("读取模型参数，从%s" % ckpt.model_checkpoint_path)
+        logger.info("读取模型参数，从%s" % ckpt.model_checkpoint_path)
         model.saver.restore(sess, ckpt.model_checkpoint_path)
 
     else:
         logger.info("重新训练模型")
-        sess.run(tf.global_variables_initializer())
+        sess.run(tf.compat.v1.global_variables_initializer())
         if config['pre_emb']:
             emb_weights = sess.run(model.word_lookup.read_value())
             emb_weights = load_word2vec(config['emb_file'], id_to_word, config['word_dim'], emb_weights)
